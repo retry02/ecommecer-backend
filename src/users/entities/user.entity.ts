@@ -12,13 +12,13 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   name: string;
 
   @Column()
   lastname: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: false })
   email: string;
 
   @Column({ type: 'decimal', precision: 10 })
@@ -27,25 +27,25 @@ export class User {
   @Column({ nullable: true })
   image?: string;
 
-  @Column()
+  @Column({ nullable: false })
   password: string;
 
   @Column({ nullable: true })
   tonification_token: string;
 
-  // * Add a Creation date - Agrega una fecha de creación
+  // * Add a Creation date - Agrega una fecha de creación.
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   created_ad: Date;
 
-  // * Add a updated date - Agrega una fecha de actualización
+  // * Add a updated date - Agrega una fecha de actualización.
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updated_ad: Date;
 
-  // * Add a deletion date - Agrega una fecha de eliminación
+  // * Add a deletion date - Agrega una fecha de eliminación.
   @DeleteDateColumn()
   deletedAt: Date;
 
-  // * Encrypting the password - Encriptando la contraseña
+  // * Encrypting the password - Encriptando la contraseña.
   @BeforeInsert()
   async hashPassword() {
     this.password = await hash(this.password, Number(process.env.HASH_SALT));

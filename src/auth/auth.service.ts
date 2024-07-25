@@ -3,9 +3,9 @@ import { User } from 'src/users/entities/user.entity';
 import { RegisterAuthDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoginAuthDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { compare } from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +37,18 @@ export class AuthService {
       );
     }
     const newUser = this.usersRepository.create(user);
-    return this.usersRepository.save(newUser);
+    const userSave = await this.usersRepository.save(newUser);
+
+    // TODO: Creating the user token and returning the data - Creando el token de usuario y retornando con la data.
+    const payload = { id: userSave.id, name: userSave.name };
+    const token = this.jwtService.sign(payload);
+    const data = {
+      user: userSave,
+      token: 'Bearer ' + token,
+    };
+    // * This action deletes the password so as not to return it - Esta acción elimina la contraseña para no retornarla.
+    delete data.user.password;
+    return data;
   }
 
   async login(loginData: LoginAuthDto) {
@@ -58,12 +69,15 @@ export class AuthService {
       );
     }
 
+    // TODO: Creating the user token and returning the data - Creando el token de usuario y retornando con la data.
     const payload = { id: userFound.id, name: userFound.name };
     const token = this.jwtService.sign(payload);
     const data = {
       user: userFound,
-      token: token,
+      token: 'Bearer ' + token,
     };
+    // * This action deletes the password so as not to return it - Esta acción elimina la contraseña para no retornarla.
+    delete data.user.password;
     return data;
   }
 }

@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  ParseIntPipe,
+  Put,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -33,9 +35,10 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @UseGuards(JwtAuthGuard)
+  @Put(':id') // http://localhost:3001/api/v1/users/:id -> PUT
+  update(@Param('id', ParseIntPipe) id: number, @Body() user: UpdateUserDto) {
+    return this.usersService.update(id, user);
   }
 
   @Delete(':id')
